@@ -9,7 +9,7 @@ class GeoplanetPlace < ActiveRecord::Base
   has_many :adjacent_places, :through => :adjacencies
 
   def self.build_ancestry_from_parent_ids! parent_id = nil, ancestry = nil
-    parent_id = parent_id || -1
+    parent_id = parent_id || 0
     self.base_class.all(:conditions => {:parent_woeid => parent_id}).each do |node|
       node.without_ancestry_callbacks do
         node.update_attribute ancestry_column, ancestry

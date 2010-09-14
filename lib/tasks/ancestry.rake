@@ -8,8 +8,11 @@ namespace :geoplanet do
   require 'net/http'
   require 'crack'
 
+  # add continents as parent to countries etc
+  # Africa, Asia, North America, South America, Europe, Antarctic, Australia and Oceania
+  
   task :continents => :environment do
-    [24865670, 24865671, 24865672, 24865673, 24865675, 28289421, 55949070].each do |woeid_continent|
+   [24865670, 24865671, 24865672, 24865673, 24865675, 28289421, 55949070, 28289417].each do |woeid_continent|
       url = "http://where.yahooapis.com/v1/place/#{woeid_continent}/children;count=0?select=long&format=json&lang=de-DE&appid=yriO3VLV34FFnugEQiyGOPxdYv34qVysSj18QREiX5OCucPPM4fv9Kxk1H3yp2SJ"
       response = Net::HTTP.get_response(URI.parse(url)).body.to_s
       json = Crack::JSON.parse(response)

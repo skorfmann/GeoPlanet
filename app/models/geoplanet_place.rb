@@ -4,9 +4,11 @@ class GeoplanetPlace < ActiveRecord::Base
 
   set_primary_key 'woeid'
 
+
   has_many :aliases, :class_name => 'GeoplanetAlias', :foreign_key => 'woeid'
   has_many :adjacencies, :class_name => 'GeoplanetAdjacency', :foreign_key => 'woeid'
   has_many :adjacent_places, :through => :adjacencies
+  has_many :slugs, :class_name => "GeoplanetSlug", :foreign_key => 'woeid'
 
   named_scope :language, lambda {|code| {:conditions => {:language => code.to_s}}}
   named_scope :select, lambda {|*columns| {:select => columns.map {|column| "geoplanet_places.#{column.to_s}"}.join(", ") } }
@@ -27,6 +29,16 @@ class GeoplanetPlace < ActiveRecord::Base
     end
   end
 
+
+  def sluggable_path
+    slug_path = GeoplanetPlace.find(:all,
+                        :conditions => {:woeid => ancestry.split("/").map(&:to_i),
+                                        :place_type => %w(Country State Town)},
+                        :order => "(case when ancestry is null then 0 else 1 end), ancestry")
+    slug_path.push(self)
+    slug_path.map! {|sp| sp.name.gsub("\s", "+") }
+    slug_path.join("/")
+  end
 
 
 end

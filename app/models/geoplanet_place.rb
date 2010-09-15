@@ -11,7 +11,7 @@ class GeoplanetPlace < ActiveRecord::Base
   named_scope :language, lambda {|code| {:conditions => {:language => code.to_s}}}
   named_scope :select, lambda {|*columns| {:select => columns.map {|column| "geoplanet_places.#{column.to_s}"}.join(", ") } }
 
-  %w(continent country state city).each do |place_type|
+  %w(continent country state town).each do |place_type|
     instance_eval do
       named_scope place_type.pluralize.to_sym, :conditions => {:place_type => place_type.capitalize }
     end

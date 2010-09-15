@@ -1,0 +1,101 @@
+=AlterTable
+
+A rails plugin to execute multiple ADD, ALTER, DROP, and CHANGE clauses in a single ALTER TABLE statement.
+
+http://github.com/xing/alter_table
+
+This plugin lets you use an alter_table method in your ActiveRecord migrations
+to execute multiple ADD, ALTER, DROP, and CHANGE clauses in a single ALTER TABLE statement.
+Currently only supported for MySQL.
+
+
+The benefits:
+* Faster migrations - only one statement per altered table
+* Simpler DSL for declaring alter table statements - almost an exact copy of ActiveRecord create_table syntax
+* Support for more databases like PostgreSQL is planned
+
+
+==Prerequisites
+
+* ActiveRecord
+
+The plugin has been tested with ActiveRecord 2.3.5 and MySQL 5.0, but other versions are likely to work. 
+
+
+==Installation
+
+  cd path/to/your/rails-project
+  ./script/plugin install git://github.com/xing/alter_table.git
+
+
+==Usage
+
+  class AlterPeopleTable < ActiveRecord::Migration
+    def self.up
+      alter_table :people do |t|
+        t.change_column(:first_name, :string, :default => "John", :null => false)
+        t.add_column(:last_name, :string, :default => "Doe", :null => false)
+        t.remove_column(:street)
+        t.rename_column(:phone, :telephone)
+        t.add_index(:last_name)
+        t.remove_index(:zip)
+      end
+    end
+
+    def self.down
+      ...
+    end
+  end
+  
+The produced SQL would look like this:
+
+  ALTER TABLE `people`
+  CHANGE `first_name` `first_name` varchar(255) DEFAULT 'John' NOT NULL,
+  ADD `last_name` varchar(255) DEFAULT 'Doe' NOT NULL,
+  DROP `street`,
+  CHANGE `phone` `telephone` varchar(64),
+  ADD INDEX `index_people_on_last_name` (`last_name`),
+  DROP INDEX `index_people_on_zip`
+
+
++alter_table+ works almost like +create_table+. The following methods are available:
+
+* change_column
+* add_column
+* remove_column
+* rename_column
+* add_index
+* remove_index
+
+All methods take the same parameters as the normal migration methods.  
+Except, you always omit the table name as the first parameter.
+
+
+==Running the plugin tests
+
+1. Modify <tt>test/database.yml</tt> to fit your test environment.
+2. If needed, create the test database you configured in <tt>test/database.yml</tt>.
+
+Then you can run 
+    
+  rake test:plugins PLUGIN=alter_table
+    
+from your Rails project root or
+    
+  rake 
+    
+from <tt>vendor/plugins/alter_table</tt>.
+
+
+==Authors
+
+{Tim Payton}[http://github.com/dizzy42] and
+{Sebastian Roebke}[http://github.com/boosty]
+
+Please find out more about our work in our 
+{dev blog}[http://devblog.xing.com].
+
+
+Copyright (c) 2010 {XING AG}[http://www.xing.com/]
+ 
+Released under the MIT license. For full details see MIT-LICENSE included in this distribution.
